@@ -1,0 +1,486 @@
+*[dev__shadow="inset"] {
+    -webkit-box-shadow: 0 0 40px rgba(0, 0, 0, .8) inset;
+    -moz-box-shadow: 0 0 40px rgba(0, 0, 0, .8) inset;
+    box-shadow: 0 0 40px rgba(0, 0, 0, .8) inset;
+}
+
+/* Общие стили для полей ввода */
+div[class^=dev__] input,
+div[class^=dev__] textarea {
+    width: 100%;
+    margin-bottom: 15px;
+}
+
+div[class^=dev__] input,
+div[class^=dev__] textarea {
+    display: block;
+    width: 100%;
+    height: 34px;
+    padding: 6px 12px;
+    font-size: 14px;
+    line-height: 1.42857143;
+    color: #555;
+    background-color: #fff;
+    background-image: none;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
+    -webkit-transition: border-color ease-in-out .15s, -webkit-box-shadow ease-in-out .15s;
+    -o-transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+    transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+}
+div[class^=dev__] input:focus,
+div[class^=dev__] textarea:focus {
+    border-color: #66afe9;
+    outline: 0;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(102, 175, 233, .6);
+    box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(102, 175, 233, .6);
+}
+div[class^=dev__] input::-moz-placeholder,
+div[class^=dev__] textarea::-moz-placeholder {
+    color: #999;
+    opacity: 1;
+}
+div[class^=dev__] input:-ms-input-placeholder,
+div[class^=dev__] textarea:-ms-input-placeholder {
+    color: #999;
+}
+div[class^=dev__] input::-webkit-input-placeholder,
+div[class^=dev__] textarea::-webkit-input-placeholder {
+    color: #999;
+}
+div[class^=dev__] input::-ms-expand,
+div[class^=dev__] textarea::-ms-expand {
+    background-color: transparent;
+    border: 0;
+}
+div[class^=dev__] input[disabled],
+div[class^=dev__] textarea[disabled],
+div[class^=dev__] input[readonly],
+div[class^=dev__] textarea[readonly] {
+    background-color: #eee;
+    opacity: 1;
+}
+div[class^=dev__] input[disabled],
+div[class^=dev__] textarea[disabled] {
+    cursor: not-allowed;
+}
+
+div[class^=dev__] textarea {
+    height: auto;
+    resize: none;
+}
+/* Общие стили для полей ввода End */
+
+
+/* Стили для всплывающего окна Настроек элемента */
+.dev__popup {
+    text-align: center;
+    overflow: hidden;
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0; /* z-index: 1050; */
+    -webkit-overflow-scrolling: touch;
+    outline: 0;
+    opacity: 0;
+    -webkit-transition: opacity 0.15s linear, z-index 0.15;
+    -o-transition: opacity 0.15s linear, z-index 0.15;
+    transition: opacity 0.15s linear, z-index 0.15;
+    z-index: -1;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+.dev__popup:before {
+    content: "";
+    display: inline-block;
+    height: auto;
+    vertical-align: middle;
+    margin-right: -0px;
+    height: 100%;
+}
+.dev__modalOpen {
+    z-index: 99999;
+    opacity: 1;
+}
+
+.dev__popupInner {
+    -webkit-transform: translate(0, -25%);
+    -ms-transform: translate(0, -25%);
+    transform: translate(0, -25%);
+    -webkit-transition: -webkit-transform 0.3s ease-out;
+    -o-transition: -o-transform 0.3s ease-out;
+    transition: -webkit-transform 0.3s ease-out;
+    -o-transition: transform 0.3s ease-out;
+    transition: transform 0.3s ease-out;
+    transition: transform 0.3s ease-out, -webkit-transform 0.3s ease-out;
+    display: inline-block;
+    vertical-align: middle;
+    width: 90%;
+    margin: 30px auto;
+}
+.dev__popupWrap {
+    display: block;
+    width: 100%;
+    position: relative;
+    background-color: #fff;
+    border: 1px solid #999;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    border-radius: 6px;
+    -webkit-box-shadow: 0 3px 9px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 3px 9px rgba(0, 0, 0, 0.5);
+    background-clip: padding-box;
+    outline: 0;
+    text-align: left;
+    padding: 15px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+.dev__modalOpen .dev__popupInner {
+    -webkit-transform: translate(0, 0);
+    -ms-transform: translate(0, 0);
+    transform: translate(0, 0);
+    position: relative;
+    z-index: 999;
+}
+.dev__modalOpen .dev__popupOverlay {
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 99;
+}
+.dev__popupOverlay {
+    background: rgba(0, 0, 0, 0);
+    height: 100vh;
+    width: 100%;
+    position: fixed;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 0;
+    -webkit-transition: background 0.15s linear;
+    -o-transition: background 0.15s linear;
+    transition: background 0.15s linear;
+}
+.dev__popupClose {
+    position: absolute;
+    right: 0;
+    top: -30px;
+    cursor: pointer;
+    z-index: 99;
+    font-size: 30px;
+    color: #fff;
+}
+
+.dev__popupContent {
+    -webkit-transition: all .6s ease 0s;
+       -moz-transition: all .6s ease 0s;
+         -o-transition: all .6s ease 0s;
+            transition: all .6s ease 0s;
+}
+
+.dev__popupContent .panel {
+    background-color: transparent !important;
+}
+
+.dev__popupContent .dev__panelAdd input,
+.dev__popupContent .dev__panelAdd textarea {
+    border-color: #337ab7 !important;
+}
+/* Стили для всплывающего окна Настроек элемента End */
+
+
+
+.dev__elemInfo {
+    position: fixed;
+    top: 5px;
+    right: 10px;
+    text-transform: lowercase;
+}
+
+.dev__generate {
+    position: fixed;
+    padding: 3px 15px;
+    border: 1px solid #000;
+    top: 10px;
+    left: 10px;
+    cursor: pointer;
+}
+
+.dev__hamburger {
+    position: fixed;
+    top: 20px;
+    right: 10px;
+    cursor: pointer;
+
+    -webkit-transition: all .6s ease 0s;
+       -moz-transition: all .6s ease 0s;
+         -o-transition: all .6s ease 0s;
+            transition: all .6s ease 0s;
+}
+
+.dev__hamburger img {
+    width: 50px;
+    height: auto;
+    position: relative;
+    z-index: 2;
+    cursor: pointer;
+}
+
+.dev__hamburger ul.dev__hamburgerMenu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    min-width: 100px;
+    right: 0;
+    border: 1px solid #000;
+    background-color: #fff;
+    z-index: 3;
+}
+
+.dev__hamburger ul.dev__hamburgerMenu li {
+    white-space: nowrap;
+    cursor: pointer;
+    padding: 6px 10px;
+    -webkit-transition: all .6s ease 0s;
+    -moz-transition: all .6s ease 0s;
+    -o-transition: all .6s ease 0s;
+    transition: all .6s ease 0s;
+
+    position: relative;
+}
+
+.dev__hamburger ul.dev__hamburgerMenu li:not(:last-child):after {
+    content: '';
+    display: block;
+    height: 1px;
+    left: 20px;
+    right: 20px;
+    bottom: 0;
+    position: absolute;
+    background-color: #000;
+}
+
+.dev__hamburger ul.dev__hamburgerMenu li:hover {
+    background-color: #ccc;
+}
+
+.dev__panel {
+    margin-bottom: 15px;
+    padding-left: 7px !important;
+    padding-right: 7px !important;
+    padding-bottom: 0 !important;
+}
+
+.dev__panelBody {
+    display: table;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    padding-bottom: 0 !important;
+}
+
+.dev__libraryElem {
+    margin: 0 7px 15px !important;
+}
+
+/* ------------------------ Панель паддингов/марджинов ------------------------ */
+.dev__indentsWrap {
+    box-shadow:
+            0 0 0 5px rgba(255, 255, 255, 1) inset,
+            0 0 0 65px rgba(0, 255, 0, .5) inset,
+            0 0 0 140px rgba(0, 255, 255, .5) inset;
+}
+
+.dev__indentsWrap>.panel {
+    margin-bottom: 0 !important;
+    background-color: transparent !important;
+
+    box-shadow:
+            0 0 0 5px rgba(255, 255, 255, 1) inset,
+            0 0 0 65px rgba(188, 232, 241, 1) inset,
+            0 0 0 140px rgba(214, 233, 198, 1) inset;
+}
+
+.dev__indentsWrap>.panel>.panel-body {
+    padding-bottom: 0 !important;
+}
+
+.dev__indentsWrap table {
+    width: 100%;
+}
+
+.dev__indentsWrap table td {
+    text-align: center;
+}
+
+.dev__indentsWrap table td:not(:nth-child(3)) {
+    width: 50px;
+}
+
+.dev__indentsWrap table td:nth-child(2),
+.dev__indentsWrap table td:nth-child(4) {
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.dev__indentsWrap input {
+    width: 50px !important;
+    height: 50px !important;
+    display: inline-block !important;
+    padding: 5px !important;
+    margin-bottom: 10px !important;
+    text-align: center;
+}
+
+.dev__indentsWrap textarea {
+    margin-bottom: 10px !important;
+}
+
+.dev__indentsWrap .panel-body {
+    padding: 10px !important;
+}
+/* ------------------------ Панель паддингов/марджинов End -------------------- */
+
+
+
+/* ------------------------ Панель elemTree ------------------------ */
+.dev__elementTreeInner {
+    padding: 6px !important;
+}
+
+.dev__elemTree__item {
+    padding: 6px 32px 6px 6px !important;
+    text-align: left !important;
+    position: relative;
+    display: block !important;
+    margin-bottom: 7px !important;
+}
+
+.dev__elementTree:after {
+    content: '';
+    display: table;
+    clear: both;
+}
+
+.dev__treeCol {
+    float: left;
+}
+
+.dev__popupContent .dev__treeElemMenu {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-top: 10px;
+    z-index: 10;
+    background-color: #fff !important;
+    display: none;
+}
+
+.dev__treeElemMenu.init {
+    display: none;
+}
+
+.dev__treeElemMenuItem {
+    white-space: nowrap;
+    cursor: pointer;
+    padding: 6px 10px;
+    -webkit-transition: all .6s ease 0s;
+    -moz-transition: all .6s ease 0s;
+    -o-transition: all .6s ease 0s;
+    transition: all .6s ease 0s;
+    color: #000;
+
+    position: relative;
+}
+
+.dev__treeElemMenuItem:not(:last-child):after {
+    content: '';
+    display: block;
+    height: 1px;
+    left: 20px;
+    right: 20px;
+    bottom: 0;
+    position: absolute;
+    background-color: #000;
+}
+
+.dev__treeElemMenuItem:hover {
+    background-color: #ccc;
+    color: #000;
+}
+
+.dev__treeCol {
+    padding: 0 7px;
+    border-right: 1px solid #337ab7;
+}
+
+.dev__treeCol:last-child {
+    padding-right: 0;
+    border-right: 0 none;
+}
+
+.dev__treeCol:first-child {
+    padding-left: 0;
+}
+
+.dev__treeElemMenuHumburger {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    display: block;
+    top: 6px;
+    right: 6px;
+}
+
+.dev__treeElemMenuHumburger:before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 20px;
+    height: 4px;
+    background: #fff;
+    box-shadow:
+            0 8px 0 0 #fff,
+            0 16px 0 0 #fff;
+}
+
+/* ------------------------ Панель elemTree End -------------------- */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
