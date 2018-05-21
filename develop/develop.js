@@ -104,51 +104,47 @@ jQuery(document).ready(function ($) {
 
     function create_dev__elementTree(){
         var elementTree = '<div class="dev__elementTreeWrap panel panel-default">' +
-            '<div class="dev__elementTreeInner panel-body">' +
-            '<div class="dev__elementTree"></div>' +
-            '</div>' +
-            '</div>';
+                                '<div class="dev__elementTreeInner panel-body">' +
+                                    '<div class="dev__elementTree"></div>' +
+                                '</div>' +
+                        '</div>';
 
         var $elementTree = $(elementTree);
         return $elementTree;
     }
 
     function create_treeElemsMenu($this) {
-        // if ( !$this.hasClass('init') ) {
 
-            var treeElemsMenuArray = [
-                {
-                    'text': 'Вставить внутрь',
-                    'action': 'dev__elemTreeInsertChild',
-                },
-                {'text': 'Вставить после'},
-                {'text': 'Вставить перед'},
-                {'text': 'Удалить'},
-                {'text': 'Дублировать'},
-            ];
+        var treeElemsMenuArray = [
+            {
+                'text': 'Вставить внутрь',
+                'action': 'dev__elemTreeInsertChild',
+            },
+            {'text': 'Вставить после'},
+            {'text': 'Вставить перед'},
+            {'text': 'Удалить'},
+            {'text': 'Дублировать'},
+        ];
 
-            if ( !$this.find('.dev__treeElemMenu').length ) {
+        if ( !$this.find('.dev__treeElemMenu').length ) {
 
-                $this.parent('.dev__elementTree').find('.dev__treeElemMenu').remove();
+            // $this.parent('.dev__elementTree').find('.dev__treeElemMenu').remove();
 
-                var $dev__treeElemMenu = $('<ul class="dev__treeElemMenu panel panel-primary"></ul>').appendTo( $this );
+            var $dev__treeElemMenu = $('<ul class="dev__treeElemMenu panel panel-primary"></ul>').appendTo( $this );
 
-                treeElemsMenuArray.forEach(function(treeElemMenuItem){
+            treeElemsMenuArray.forEach(function(treeElemMenuItem){
 
-                    $('<li class="dev__treeElemMenuItem" action="'+treeElemMenuItem.action+'">'+treeElemMenuItem.text+'</li>').appendTo( $dev__treeElemMenu );
+                $('<li class="dev__treeElemMenuItem" action="'+treeElemMenuItem.action+'">'+treeElemMenuItem.text+'</li>').appendTo( $dev__treeElemMenu );
 
-                });
-
-                $(document).on('click', '.dev__treeElemMenuHumburger', function(){
-
-                    $(this).next('.dev__treeElemMenu').slideToggle();
-
-                });
-            }
-       /* } else {
-            $this.removeClass('init');
-        }*/
+            });
+        }
     }
+
+    $(document).on('click', '.dev__treeElemMenuHumburger', function(){
+
+        $(this).next('.dev__treeElemMenu').slideToggle();
+
+    });
 
     /* Параметр - DOM-элемент */
     function hightlightElem_AddHamburger (currentElem) {
@@ -873,8 +869,9 @@ jQuery(document).ready(function ($) {
 
                 /* Клик по кнопке Элемент в dev__elemTree */
                 $(document).on('click', '.dev__elemTree__item', function(e){
-                    
-                    if ( /*e.target.tagName !== 'LI' ||*/ e.target.className !== 'dev__treeElemMenuHumburger' ) {
+
+                    if ( e.target.className !== 'dev__treeElemMenuItem' && e.target.className !== 'dev__treeElemMenuHumburger' ) {
+                        
                         /*
                          По клику на кнопку Элемента в dev__elemTree
                              1) Берем атрибут tagname нажатой кнопки
