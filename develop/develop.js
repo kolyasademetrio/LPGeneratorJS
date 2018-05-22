@@ -140,7 +140,21 @@ jQuery(document).ready(function ($) {
         }
     }
 
+    function create_devElemTreeItem(dev__elemTreeItem_class, tagName){
+        var dev__elemTreeItem_class = ( dev__elemTreeItem_class !== undefined ) ? (dev__elemTreeItem_class+' ') : '';
+
+        var $elemTree_item = $('<div class="'+dev__elemTreeItem_class+'dev__elemTree__item btn btn-primary init" tagname="'+tagName+'">' +
+                                    '<div class="dev__elemTree__itemTagname">'+tagName+'</div>' +
+                                    '<div class="dev__elemTree__itemClasses"></div>' +
+                                    '<div class="dev__treeElemMenuHumburger"></div>' +
+                                '</div>');
+
+        return $elemTree_item;
+    }
+
     $(document).on('click', '.dev__treeElemMenuHumburger', function(){
+
+        $('.dev__treeElemMenu').hide();
 
         $(this).next('.dev__treeElemMenu').slideToggle();
 
@@ -848,13 +862,15 @@ jQuery(document).ready(function ($) {
 
                 var classesArray = getElemClassesArray( $elemToEdit );
 
-                var $elemToEditBtn = $('<div class="dev__elemToEdit dev__elemTree__item btn btn-primary init" text="DIV" tagname="'+$elemToEdit.prop('tagName')+'">' +
-                                            '<div class="dev__elemTree__itemTagname">' +
-                                                $elemToEdit.prop('tagName') +
-                                            '</div>' + ' ' +
-                                            '<div class="dev__elemTree__itemClasses"></div>' +
-                                            '<div class="dev__treeElemMenuHumburger"></div>' +
-                                        '</div>');
+                var $elemToEditBtn = create_devElemTreeItem( 'dev__elemToEdit', $elemToEdit.prop('tagName') );
+
+                if ( $elemToEdit.attr('class') ) {
+                    $elemToEditBtn.attr('elem_classes', $elemToEdit.attr('class'));
+                }
+
+                if ( $elemToEdit.attr('id') ) {
+                    $elemToEditBtn.attr('elem_id', $elemToEdit.attr('id'));
+                }
 
                 $('.dev__elementTree').find('.col_0').append( $elemToEditBtn );
 
@@ -888,8 +904,12 @@ jQuery(document).ready(function ($) {
                         if ( $this.parents('.dev__popup').find('.dev__panel').length ) {
                             $this.parents('.dev__popup').find('.dev__panel').remove();
                         }
-
+                        
                         $elemToEdit.find('.dev__elementTreeWrap').parent().append( create_dev__panelAddInner( $(this) ) );
+
+                        var $devPanel = $elemToEdit.find('.dev__panelAdd');
+
+                        $devPanel.before( createDevPanel_withTagsToAdd_list('dev__devPanel__addElementTree') );
 
                         inputsArray.forEach(function(item){
 
@@ -924,6 +944,10 @@ jQuery(document).ready(function ($) {
                                     $(elem).val( $elemToEdit.attr( elemAttrName ) );
                                 }
                             });
+                        } else {
+
+
+
                         }
 
                     }
@@ -932,6 +956,8 @@ jQuery(document).ready(function ($) {
 
                 $(document).on('click', '.dev__treeElemMenuItem', function(e){
                     $this = $(this);
+
+                    $('.dev__treeElemMenu').hide();
 
                     /* Вставить внутрь */
                     if ( $this.attr('action') === 'dev__elemTreeInsertChild' ) {
@@ -945,11 +971,8 @@ jQuery(document).ready(function ($) {
                         }
 
 
-                        var $elemTreeBtn = $('<div class="dev__elemTree__item btn btn-primary init" text="DIV" tagname="div">' +
-                                                    '<div class="dev__elemTree__itemTagname">DIV</div>' +
-                                                    '<div class="dev__elemTree__itemClasses"></div>' +
-                                                    '<div class="dev__treeElemMenuHumburger"></div>' +
-                            '</div>');
+                        var $elemTreeBtn  = create_devElemTreeItem('', 'DIV');
+
 
                         $this.parents('.dev__treeCol').next().append( $elemTreeBtn );
 
@@ -959,13 +982,14 @@ jQuery(document).ready(function ($) {
 
 
 
-                        var $devPanel = createDevPanel_withTagsToAdd_list('dev__devPanel__addElementTree');
+                       /* var $devPanel = createDevPanel_withTagsToAdd_list('dev__devPanel__addElementTree');
 
-                        $this.parents('.dev__popup').find('.dev__elementTreeWrap').parent().append( $devPanel );
+                        $this.parents('.dev__popup').find('.dev__elementTreeWrap').parent().append( $devPanel );*/
 
                         $this.parents('.dev__popup').find('.dev__saveChanges').attr('action', 'dev__elemTreeInsertChild');
 
                         $this.parents('.dev__popup').find('.dev__panelAdd').remove();
+                        $this.parents('.dev__popup').find('.dev__panel').remove();
 
                     }
 
