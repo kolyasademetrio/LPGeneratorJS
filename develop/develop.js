@@ -89,7 +89,7 @@ jQuery(document).ready(function ($) {
         }
 
         var devPanelAdd = '<div class="dev__panelAdd panel panel-primary">' +
-                                '<div class="panel-heading text-center dev__">' + 'Настройте ' + $this.attr('text') + '</div>' +
+                                '<div class="panel-heading text-center dev__">' + 'Настройте <span>' + $this.attr('text') + '</span></div>' +
                                 '<div class="dev__panelAddBody panel-body">' +
                                     '<div class="row">' +
                                         '<div class="dev__panelAddInner"></div>' +
@@ -883,118 +883,7 @@ jQuery(document).ready(function ($) {
 
                 create_treeElemsMenu( $elemToEditBtn );
 
-                /* Клик по кнопке Элемент в dev__elemTree */
-                $(document).on('click', '.dev__elemTree__item', function(e){
 
-                    if ( e.target.className !== 'dev__treeElemMenuItem' && e.target.className !== 'dev__treeElemMenuHumburger' ) {
-                        
-                        /*
-                         По клику на кнопку Элемента в dev__elemTree
-                             1) Берем атрибут tagname нажатой кнопки
-                             2) Создаем dev__panelAdd для полей input редактирования этого элемента
-                             3) Вставляем эту панель в самый конец dev__popupContainer
-                             4) Вставляем поля в dev__panelAdd из массива inputsArray( циклом )
-                             5) Если у элемента нет класса init(это не первая загрузка корневого элемента и не первый клик по нему)
-                                1) Создаем меню для редактирования dev__elemTree__item и вставляем его внутрь редактируемого элемента
-                         */
-                        var $this = $(this),
-                            $elemToEdit = getCurrentElemToEdit_selectedOnViewport( $(e.target) ),
-                            dataTagName = $(this).attr('tagname');
-
-                        if ( $this.parents('.dev__popup').find('.dev__panel').length ) {
-                            $this.parents('.dev__popup').find('.dev__panel').remove();
-                        }
-                        
-                        $elemToEdit.find('.dev__elementTreeWrap').parent().append( create_dev__panelAddInner( $(this) ) );
-
-                        var $devPanel = $elemToEdit.find('.dev__panelAdd');
-
-                        $devPanel.before( createDevPanel_withTagsToAdd_list('dev__devPanel__addElementTree') );
-
-                        inputsArray.forEach(function(item){
-
-                            var exeptionTAGs = item.exceptions,
-                                onlyTAGs = item.only;
-
-                            /* Если ID выбранного на фронте блока есть в массиве Исключений то пункт меню не добавляется */
-                            // if ( $.inArray( dataTagName, exeptionTAGs ) === -1 ) {
-                            if ( $.inArray( dataTagName, exeptionTAGs ) === -1 && (onlyTAGs.length === 0 || $.inArray( dataTagName, onlyTAGs) !== -1 ) ) {
-                                var classCols = item.fieldName == 'dev__textNameField' ? 'col-xs-12' : 'col-xs-6';
-
-                                $('.dev__panelAddInner').append('<div class="'+classCols+'">'+item.input+'</div>');
-
-                            }
-                        });
-
-                        /* Берем все поля внутри dev__panelAdd */
-                        var $inputs = $elemToEdit.find('.dev__panelAddInner').find('input, textarea');
-
-                        /*
-                         Если клик по Кнопке "Родительский элемент"
-                         1) Проходим циклом по полям добавленным в dev__panelAdd
-                         2) Записываем в текстовое поле значения этих атрибутов Родительского элемента
-                         (классы, id, href) для дальнейшего редактирования
-                         */
-                        if ( $(this).hasClass('dev__elemToEdit') ) {
-
-                            $inputs.each(function(index, elem){
-                                var elemAttrName = $(elem).attr('name');
-
-                                if ( elemAttrName !== 'innerText' ) {
-                                    $(elem).val( $elemToEdit.attr( elemAttrName ) );
-                                }
-                            });
-                        } else {
-
-
-
-                        }
-
-                    }
-                });
-
-
-                $(document).on('click', '.dev__treeElemMenuItem', function(e){
-                    $this = $(this);
-
-                    $('.dev__treeElemMenu').hide();
-
-                    /* Вставить внутрь */
-                    if ( $this.attr('action') === 'dev__elemTreeInsertChild' ) {
-
-                        if ( !$this.parents('.dev__treeCol').next().length ) {
-
-                            var currentColIndex = $this.parents('.dev__treeCol').index(),
-                                nextColIndex = ++currentColIndex;
-
-                            $('<div class="dev__treeCol" id="col_'+nextColIndex+'"></div>').insertAfter( $this.parents('.dev__treeCol') );
-                        }
-
-
-                        var $elemTreeBtn  = create_devElemTreeItem('', 'DIV');
-
-
-                        $this.parents('.dev__treeCol').next().append( $elemTreeBtn );
-
-                        create_treeElemsMenu( $elemTreeBtn );
-
-
-
-
-
-                       /* var $devPanel = createDevPanel_withTagsToAdd_list('dev__devPanel__addElementTree');
-
-                        $this.parents('.dev__popup').find('.dev__elementTreeWrap').parent().append( $devPanel );*/
-
-                        $this.parents('.dev__popup').find('.dev__saveChanges').attr('action', 'dev__elemTreeInsertChild');
-
-                        $this.parents('.dev__popup').find('.dev__panelAdd').remove();
-                        $this.parents('.dev__popup').find('.dev__panel').remove();
-
-                    }
-
-
-                });
 
 
 
@@ -1048,6 +937,161 @@ jQuery(document).ready(function ($) {
             }
             setMainContainerOnEvents(e);
         });
+
+        /* Клик по кнопке Элемент в dev__elemTree */
+        $(document).on('click', '.dev__elemTree__item', function(e){
+
+            if ( e.target.className !== 'dev__treeElemMenuItem' && e.target.className !== 'dev__treeElemMenuHumburger' ) {
+
+                /*
+                 По клику на кнопку Элемента в dev__elemTree
+                 1) Берем атрибут tagname нажатой кнопки
+                 2) Создаем dev__panelAdd для полей input редактирования этого элемента
+                 3) Вставляем эту панель в самый конец dev__popupContainer
+                 4) Вставляем поля в dev__panelAdd из массива inputsArray( циклом )
+                 5) Если у элемента нет класса init(это не первая загрузка корневого элемента и не первый клик по нему)
+                 1) Создаем меню для редактирования dev__elemTree__item и вставляем его внутрь редактируемого элемента
+                 */
+                var $this = $(this),
+                    $elemToEdit = getCurrentElemToEdit_selectedOnViewport( $(e.target) ),
+                    dataTagName = $(this).attr('tagname');
+
+                if ( $this.parents('.dev__popup').find('.dev__panel').length ) {
+                    $this.parents('.dev__popup').find('.dev__panel').remove();
+                }
+
+                $elemToEdit.find('.dev__elementTreeWrap').parent().append( create_dev__panelAddInner( $(this) ) );
+
+                var $devPanel = $elemToEdit.find('.dev__panelAdd');
+
+                $devPanel.before( createDevPanel_withTagsToAdd_list('dev__devPanel__addElementTree') );
+
+                inputsArray.forEach(function(item){
+
+                    var exeptionTAGs = item.exceptions,
+                        onlyTAGs = item.only;
+
+                    /* Если ID выбранного на фронте блока есть в массиве Исключений то пункт меню не добавляется */
+                    // if ( $.inArray( dataTagName, exeptionTAGs ) === -1 ) {
+                    if ( $.inArray( dataTagName, exeptionTAGs ) === -1 && (onlyTAGs.length === 0 || $.inArray( dataTagName, onlyTAGs) !== -1 ) ) {
+                        var classCols = item.fieldName == 'dev__textNameField' ? 'col-xs-12' : 'col-xs-6';
+
+                        $('.dev__panelAddInner').append('<div class="'+classCols+'">'+item.input+'</div>');
+
+                    }
+                });
+
+                /* Берем все поля внутри dev__panelAdd */
+                var $inputs = $elemToEdit.find('.dev__panelAddInner').find('input, textarea');
+
+                /*
+                 Если клик по Кнопке "Родительский элемент"
+                 1) Проходим циклом по полям добавленным в dev__panelAdd
+                 2) Записываем в текстовое поле значения этих атрибутов Родительского элемента
+                 (классы, id, href) для дальнейшего редактирования
+                 */
+
+                $elemToEdit.find('.dev__elemTree__item').removeClass('active');
+                $this.addClass('active');
+
+                if ( $this.hasClass('dev__elemToEdit') ) {
+
+                    $inputs.each(function(index, elem){
+                        var elemAttrName = $(elem).attr('name');
+
+                        if ( elemAttrName !== 'innerText' ) {
+                            $(elem).val( $elemToEdit.attr( elemAttrName ) );
+                        }
+                    });
+
+                    $elemToEdit.find('.dev__panelAdd .panel-heading span').text( $this.attr('tagname') );
+
+                } else {
+
+                    var thisAttrTagname = $this.attr('tagname');
+
+                    var $libraryElems = $elemToEdit.find('.dev__panelBody').find('.dev__libraryElem');
+
+                    $libraryElems.each(function(index, elem){
+
+                        if ( $(elem).attr('tagname').toLowerCase() === thisAttrTagname.toLowerCase() ) {
+
+                            $(elem).click();
+
+                        }
+
+                    });
+
+                }
+
+            }
+        });
+
+
+        $(document).on('click', '.dev__devPanel__addElementTree .dev__libraryElem', function(e){
+
+            var $this = $(this),
+                thisTagName = $this.attr('tagname'),
+                thisText = $this.attr('text');
+
+            console.log( $this );
+            console.log( thisTagName );
+            console.log( thisText );
+
+            var $elemToEdit = getCurrentElemToEdit_selectedOnViewport( $(this) );
+            
+            console.log( $elemToEdit );
+
+            var $devBtn = $elemToEdit.find('.dev__elementTree').find('.dev__elemTree__item.active');
+
+            $devBtn.attr('tagname', thisText);
+            $devBtn.find('.dev__elemTree__itemTagname').text( thisText );
+
+        });
+
+
+        $(document).on('click', '.dev__treeElemMenuItem', function(e){
+            $this = $(this);
+
+            $('.dev__treeElemMenu').hide();
+
+            /* Вставить внутрь */
+            if ( $this.attr('action') === 'dev__elemTreeInsertChild' ) {
+
+                if ( !$this.parents('.dev__treeCol').next().length ) {
+
+                    var currentColIndex = $this.parents('.dev__treeCol').index(),
+                        nextColIndex = ++currentColIndex;
+
+                    $('<div class="dev__treeCol" id="col_'+nextColIndex+'"></div>').insertAfter( $this.parents('.dev__treeCol') );
+                }
+
+
+                var $elemTreeBtn  = create_devElemTreeItem('', 'DIV');
+
+
+                $this.parents('.dev__treeCol').next().append( $elemTreeBtn );
+
+                create_treeElemsMenu( $elemTreeBtn );
+
+
+
+
+
+                /* var $devPanel = createDevPanel_withTagsToAdd_list('dev__devPanel__addElementTree');
+
+                 $this.parents('.dev__popup').find('.dev__elementTreeWrap').parent().append( $devPanel );*/
+
+                $this.parents('.dev__popup').find('.dev__saveChanges').attr('action', 'dev__elemTreeInsertChild');
+
+                $this.parents('.dev__popup').find('.dev__panelAdd').remove();
+                $this.parents('.dev__popup').find('.dev__panel').remove();
+
+            }
+
+
+        });
+
     })();
 
 
