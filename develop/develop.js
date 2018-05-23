@@ -966,15 +966,13 @@ jQuery(document).ready(function ($) {
                 $elemToEdit.find('.dev__elemTree__item').removeClass('active');
                 $this.addClass('active');
 
+                /* Создаем Панель с полями и Вставляем её в Конец попапа */
+                $elemToEdit.find('.dev__elementTreeWrap').parent().append( create_dev__panelAddInner( $(this), 'dev__devPanelAdd__addElementTree' ) );
+
                 /* Если есть Панель с Элементами, то удаляем её */
                 if ( $this.parents('.dev__popup').find('.dev__panel').length ) {
                     $this.parents('.dev__popup').find('.dev__panel').remove();
                 }
-
-                /* Создаем Панель с полями и Вставляем её в Конец попапа */
-                $elemToEdit.find('.dev__elementTreeWrap').parent().append( create_dev__panelAddInner( $(this), 'dev__devPanelAdd__addElementTree' ) );
-
-
 
                 /* Создаем Панель с элементами и вставляем её Перед Панелью с полями */
                 var $devPanel = $elemToEdit.find('.dev__panelAdd');
@@ -1065,7 +1063,7 @@ jQuery(document).ready(function ($) {
             }
 
             if( $devBtn.attr('elem_innerText') ) {
-                $elemToEdit.find('.dev__panelAdd').find('input[name="innerText"]').val( $devBtn.attr('elem_innerText') );
+                $elemToEdit.find('.dev__panelAdd').find('textarea[name="innerText"]').val( $devBtn.attr('elem_innertext') );
             }
 
         });
@@ -1105,10 +1103,12 @@ jQuery(document).ready(function ($) {
 
         });
 
-        $(document).on('input', '.dev__panelAdd.dev__devPanelAdd__addElementTree input, .dev__panelAdd.dev__devPanelAdd__addElementTree textarea', function(){
+        $(document).on('input', '.dev__panelAdd input, .dev__panelAdd textarea', function(){
 
             var $elemToEdit = getCurrentElemToEdit_selectedOnViewport( $(this) ),
                 $devBtn = $elemToEdit.find('.dev__elementTree').find('.dev__elemTree__item.active');
+
+            console.log( 'hhhh' );
 
             if ( $(this).attr('name') === 'id' ) {
                 $devBtn.attr( 'elem_id', $(this).val() );
