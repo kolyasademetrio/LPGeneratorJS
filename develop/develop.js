@@ -1033,7 +1033,7 @@ jQuery(document).ready(function ($) {
                     }
                 });
 
-
+                $elemToEdit.find('.dev__devPanelAdd__addElementTree .panel-heading').text( 'Настройте '+ $this.attr('tagname'));
             }
         });
 
