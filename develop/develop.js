@@ -64,6 +64,15 @@ jQuery(document).ready(function ($) {
         return classesArray;
     }
 
+    /*function removeBeforeElemForLastTreeElem(){
+        $('.dev__treeCol').each(function(index, elem){
+            
+            if ( $(elem).children().length < 1 ) {
+                $(elem).closest('.dev__elemTree__i').addClass('hasNoChild');
+            }
+        });
+    }*/
+
     function createDevPanel_withTagsToAdd_list(devPanelClassName){
 
         var devPanelClassName = ( devPanelClassName !== undefined ) ? (' '+devPanelClassName) : '';
@@ -108,7 +117,7 @@ jQuery(document).ready(function ($) {
     function create_dev__elementTree(){
         var elementTree = '<div class="dev__elementTreeWrap panel panel-default">' +
                                 '<div class="dev__elementTreeInner panel-body">' +
-                                    '<div class="dev__elementTree"></div>' +
+                                    '<div class="dev__elementTree" id="dev__elementTree"></div>' +
                                 '</div>' +
                         '</div>';
 
@@ -117,27 +126,51 @@ jQuery(document).ready(function ($) {
     }
 
     function create_treeElemsMenu($this) {
-
+        
         var treeElemsMenuArray = [
             {
                 'text': 'Вставить внутрь',
                 'action': 'dev__elemTreeInsertChild',
+                'exceptions': [],
             },
-            {'text': 'Вставить после'},
-            {'text': 'Вставить перед'},
-            {'text': 'Удалить'},
-            {'text': 'Дублировать'},
+            {
+                'text': 'Вставить после',
+                'action': 'dev__elemTreeInsertAfter',
+                'exceptions': ['dev__elemToEdit'],
+            },
+            {
+                'text': 'Вставить перед',
+                'action': 'dev__elemTreeInsertBefore',
+                'exceptions': ['dev__elemToEdit'],
+            },
+            {
+                'text': 'Удалить',
+                'action': 'dev__elemTreeRemoveElem',
+                'exceptions': ['dev__elemToEdit'],
+            },
+            {
+                'text': 'Дублировать',
+                'action': 'dev__elemTreeCopyElem',
+                'exceptions': ['dev__elemToEdit'],
+            },
         ];
 
         if ( !$this.find('.dev__treeElemMenu').length ) {
-
-            // $this.parent('.dev__elementTree').find('.dev__treeElemMenu').remove();
 
             var $dev__treeElemMenu = $('<ul class="dev__treeElemMenu panel panel-primary"></ul>').appendTo( $this );
 
             treeElemsMenuArray.forEach(function(treeElemMenuItem){
 
-                $('<li class="dev__treeElemMenuItem" action="'+treeElemMenuItem.action+'">'+treeElemMenuItem.text+'</li>').appendTo( $dev__treeElemMenu );
+                var exeptionTAGs = treeElemMenuItem.exceptions,
+                    thisAttrElem = $this.attr('elem');
+                
+                if ( $.inArray( thisAttrElem, exeptionTAGs ) === -1 ) {
+
+                    $('<li class="dev__treeElemMenuItem" action="'+treeElemMenuItem.action+'">'+treeElemMenuItem.text+'</li>').appendTo( $dev__treeElemMenu );
+
+                }
+
+
 
             });
         }
@@ -146,13 +179,47 @@ jQuery(document).ready(function ($) {
     function create_devElemTreeItem(dev__elemTreeItem_class, tagName){
         var dev__elemTreeItem_class = ( dev__elemTreeItem_class !== undefined ) ? (dev__elemTreeItem_class+' ') : '';
 
-        var $elemTree_item = $('<div class="'+dev__elemTreeItem_class+'dev__elemTree__item btn btn-primary init" tagname="'+tagName+'">' +
-                                    '<div class="dev__elemTree__itemTagname">'+tagName+'</div>' +
-                                    '<div class="dev__elemTree__itemClasses"></div>' +
-                                    '<div class="dev__treeElemMenuHumburger"></div>' +
-                                '</div>');
+        var $elemTree_item = $('<div class="dev__elemTree__i">' +
+                                    '<div elem="'+$.trim(dev__elemTreeItem_class)+'" class="'+dev__elemTreeItem_class+'dev__elemTree__item btn btn-primary init" tagname="'+tagName+'">' +
+                                        '<div class="dev__elemTree__itemTagname">'+tagName+'</div>' +
+                                        '<div class="dev__elemTree__itemClasses"></div>' +
+                                        '<div class="dev__treeElemMenuHumburger"></div>' +
+                                    '</div>' +
+                                    '<div class="dev__treeCol"></div>' +
+                               '</div>');
 
         return $elemTree_item;
+    }
+
+    function setElemTreeLines() {
+        $('.dev__treeCol').each(function(index, elem){
+
+            if ( $(elem).children().length == 0 ) {
+                $(elem).closest('.dev__elemTree__i').addClass('hasNoChild');
+            } else {
+                $(elem).closest('.dev__elemTree__i').removeClass('hasNoChild');
+            }
+
+            if ( $(elem).children('.dev__elemTree__i').length == 1 ) {
+                $(elem).closest('.dev__elemTree__i').addClass('hasOnlyOneChild');
+            } else {
+                $(elem).closest('.dev__elemTree__i').removeClass('hasOnlyOneChild');
+            }
+        });
+    }
+
+    function setTreeElemsWidthes(){
+        if ( $('.dev__treeCol').length > 0 ) {
+            $('.dev__treeCol').not('.col_0').each(function(index, elem){
+                var parentWidth = $(elem).closest('.dev__elemTree__i').outerWidth(),
+                    prevElemWidth = $(elem).prev().outerWidth(),
+                    thisElemWidth = parentWidth - prevElemWidth - 2;
+
+                $(elem).css({
+                    'width': thisElemWidth+'px',
+                });
+            });
+        }
     }
 
     function setInputsForClicked_libraryElem( $thisClicked ) {
@@ -161,46 +228,89 @@ jQuery(document).ready(function ($) {
             dataText = $this.attr('text'),
             submitBtn = $this.parents('.dev__popup').find('.dev__saveChanges');
 
-        /* Выделение текущего элемента */
-        $('.dev__libraryElem').removeClass('active');
-        $this.addClass('active');
+        var $elemToEdit = getCurrentElemToEdit_selectedOnViewport( $this );
 
-        /* Передача атрибутов добавляемого элемента кнопке + вставка текста кнопки плюс удаление класса disabled */
-        submitBtn.html('Вставить ' + dataText).attr('tagname', dataTagName).attr('text', dataText).removeClass('disabled');
+        var $devBtn = $elemToEdit.find('.dev__elementTree').find('.dev__elemTree__item.active');
+        
+        if ( !(dataTagName === 'img' && $devBtn.next('.dev__treeCol').children('.dev__elemTree__i').length > 0) ) {
+
+            /* Выделение текущего элемента */
+            $('.dev__libraryElem').removeClass('active');
+            $this.addClass('active');
+
+            /* Передача атрибутов добавляемого элемента кнопке + вставка текста кнопки плюс удаление класса disabled */
+            submitBtn.html('Вставить ' + dataText).attr('tagname', dataTagName).attr('text', dataText).removeClass('disabled');
 
 
 
-        /* Вставка .dev__panelAdd в который помещаются поля для настроек */
-        var $panelDev = $this.parents('.dev__popup').find('.dev__panel');
+            /* Вставка .dev__panelAdd в который помещаются поля для настроек */
+            var $panelDev = $this.parents('.dev__popup').find('.dev__panel');
 
-        var $devPanelAdd = create_dev__panelAddInner($this);
+            var $devPanelAdd = create_dev__panelAddInner($this);
 
-        $panelDev.after( $devPanelAdd );
+            $panelDev.after( $devPanelAdd );
 
-        inputsArray.forEach(function(item){
+            inputsArray.forEach(function(item){
 
-            var exeptionTAGs = item.exceptions,
-                onlyTAGs = item.only;
+                var exeptionTAGs = item.exceptions,
+                    onlyTAGs = item.only;
 
-            /* Если ID выбранного на фронте блока есть в массиве Исключений то пункт меню не добавляется */
-            // if ( $.inArray( dataTagName, exeptionTAGs ) === -1 ) {
-            if ( $.inArray( dataTagName, exeptionTAGs ) === -1 && (onlyTAGs.length === 0 || $.inArray( dataTagName, onlyTAGs) !== -1 ) ) {
-                var classCols = item.fieldName != 'dev__indentsField' ? 'col-xs-6' : 'col-xs-12';
+                /* Если ID выбранного на фронте блока есть в массиве Исключений то пункт меню не добавляется */
+                // if ( $.inArray( dataTagName, exeptionTAGs ) === -1 ) {
+                if ( $.inArray( dataTagName, exeptionTAGs ) === -1 && (onlyTAGs.length === 0 || $.inArray( dataTagName, onlyTAGs) !== -1 ) ) {
+                    var classCols = item.fieldName != 'dev__indentsField' ? 'col-xs-6' : 'col-xs-12';
 
-                $('.dev__panelAddInner').append('<div class="'+classCols+'">'+item.input+'</div>');
+                    $('.dev__panelAddInner').append('<div class="'+classCols+'">'+item.input+'</div>');
 
-            }
+                }
 
-        });
+            });
+
+        }
+
+
     }
 
     $(document).on('click', '.dev__treeElemMenuHumburger', function(){
 
-        $('.dev__treeElemMenu').hide();
+        $('.dev__treeElemMenuHumburger').not(this).next('.dev__treeElemMenu').hide();
 
         $(this).next('.dev__treeElemMenu').slideToggle();
 
     });
+
+    function showNotificationOnTheTopOfWindow( notificationText ) {
+        $( '<div class="dev__notification btn btn-danger"></div>' )
+            .appendTo( document.body )
+            .text( notificationText )
+            .position({
+                my: "center top",
+                at: "center top",
+                of: window
+            })
+            .show({
+                effect: "blind"
+            })
+            .delay( 2000 )
+            .hide('fade',{
+                duration: "slow"
+            }, function() {
+                $( this ).remove();
+            });
+
+        $( document ).tooltip({
+            position: {
+                my: "center top",
+                at: "center bottom+5",
+            },
+            show: {
+                duration: "fast"
+            },
+            hide: {
+                effect: "hide"
+            }
+        });
+    }
 
     /* Параметр - DOM-элемент */
     function hightlightElem_AddHamburger (currentElem) {
@@ -445,36 +555,44 @@ jQuery(document).ready(function ($) {
     var inputsArray = [
         {
             'fieldName': 'dev__classNameField',
-            'input':     '<div class="form-group dev__classNameField">' +
-            '<label for="className__field" class="dev__">Классы</label>' +
-            '<input type="text" name="class" class="form-control dev__" id="className__field" placeholder="Введите один класс или несколько через пробел">' +
-            '</div>',
+            'input': '<div class="form-group dev__classNameField">' +
+                        '<label for="className__field" class="dev__">Классы</label>' +
+                        '<input type="text" name="class" class="form-control dev__" id="className__field" placeholder="Введите один класс или несколько через пробел">' +
+                      '</div>',
             'exceptions': [],
             'only': [],
         },{
             'fieldName': 'dev__idNameField',
-            'input':     '<div class="form-group dev__classNameField">' +
-            '<label for="idName__field" class="dev__">ID</label>' +
-            '<input type="text" name="id" class="form-control dev__" id="idName__field" placeholder="Введите один ID">' +
-            '</div>',
+            'input': '<div class="form-group dev__classNameField">' +
+                        '<label for="idName__field" class="dev__">ID</label>' +
+                        '<input type="text" name="id" class="form-control dev__" id="idName__field" placeholder="Введите один ID">' +
+                     '</div>',
             'exceptions': [],
             'only': [],
         },{
             'fieldName': 'dev__hrefNameField',
-            'input':     '<div class="form-group dev__hrefField">' +
-            '<label for="dev__hrefField" class="dev__">HREF</label>' +
-            '<input type="text" name="href" class="form-control dev__" id="dev__hrefField" placeholder="Введите HREF">' +
-            '</div>',
+            'input': '<div class="form-group dev__hrefField">' +
+                        '<label for="dev__hrefField" class="dev__">HREF</label>' +
+                        '<input type="text" name="href" class="form-control dev__" id="dev__hrefField" placeholder="Введите HREF">' +
+                     '</div>',
             'exceptions': [],
             'only': ['a',],
         },{
             'fieldName': 'dev__textNameField',
-            'input':     '<div class="form-group dev__textField">' +
-            '<label for="dev__innerTextField" class="dev__">Текст внутри элемента</label>' +
-            '<textarea id="dev__innerTextField" class="dev__" name="innerText" rows="4" placeholder="Введите текст.."></textarea>' +
-            '</div>',
+            'input': '<div class="form-group dev__textField">' +
+                        '<label for="dev__innerTextField" class="dev__">Текст внутри элемента</label>' +
+                        '<textarea id="dev__innerTextField" class="dev__" name="innerText" rows="4" placeholder="Введите текст.."></textarea>' +
+                     '</div>',
             'exceptions': ['img'],
             'only': [],
+        },{
+            'fieldName': 'dev__fileNameField',
+            'input': '<div class="form-group dev__fileField">' +
+                        '<label for="dev__fileField" class="dev__">Изображение</label>' +
+                        '<input type="file" id="dev__fileField" class="form-control-file dev__" name="file">' +
+                     '</div>',
+            'exceptions': [],
+            'only': ['img'],
         },/*{
          'fieldName': 'dev__indentsField',
          'input':     '<div class="dev__indentsWrap">' +
@@ -566,7 +684,7 @@ jQuery(document).ready(function ($) {
             'text':    'P',
         },{
             'tagName': 'img',
-            'text':    'IMAGE',
+            'text':    'IMG',
         },{
             'tagName': 'header',
             'text':    'HEADER',
@@ -879,11 +997,11 @@ jQuery(document).ready(function ($) {
                 var $elemToEditBtn = create_devElemTreeItem( 'dev__elemToEdit', $elemToEdit.prop('tagName') );
 
                 if ( $elemToEdit.attr('class') ) {
-                    $elemToEditBtn.attr('elem_classes', $elemToEdit.attr('class'));
+                    $elemToEditBtn.find('.dev__elemTree__item').attr('elem_classes', $elemToEdit.attr('class'));
                 }
 
                 if ( $elemToEdit.attr('id') ) {
-                    $elemToEditBtn.attr('elem_id', $elemToEdit.attr('id'));
+                    $elemToEditBtn.find('.dev__elemTree__item').attr('elem_id', $elemToEdit.attr('id'));
                 }
 
                 $('.dev__elementTree').find('.col_0').append( $elemToEditBtn );
@@ -895,12 +1013,9 @@ jQuery(document).ready(function ($) {
                                                             '</div>');
                 });
 
-                create_treeElemsMenu( $elemToEditBtn );
+                create_treeElemsMenu( $elemToEditBtn.find('.dev__elemTree__item') );
 
-
-
-
-
+                setElemTreeLines();
 
             } else if ( $(e.target).hasClass('dev__saveChanges') ) {
 
@@ -983,7 +1098,7 @@ jQuery(document).ready(function ($) {
                     Делаем этот элемент активным
               */
                 var $libraryElems = $elemToEdit.find('.dev__panelBody').find('.dev__libraryElem');
-
+                
                 $libraryElems.each(function(index, elem){
 
                     if ( $(elem).attr('tagname').toLowerCase() === dataTagName.toLowerCase() ) {
@@ -1033,7 +1148,7 @@ jQuery(document).ready(function ($) {
                     }
                 });
 
-                $elemToEdit.find('.dev__devPanelAdd__addElementTree .panel-heading').text( 'Настройте '+ $this.attr('tagname'));
+                $elemToEdit.find('.dev__devPanelAdd__addElementTree .panel-heading').html( 'Настройте <span class="text-uppercase">'+$this.attr('tagname')+'</span>');
             }
         });
 
@@ -1041,31 +1156,38 @@ jQuery(document).ready(function ($) {
         $(document).on('click', '.dev__devPanel__addElementTree .dev__libraryElem', function(e){
 
             var $this = $(this),
-                thisText = $this.attr('text');
+                thisText = $this.attr('text'),
+                thisTagname = $this.attr('tagname');
 
             var $elemToEdit = getCurrentElemToEdit_selectedOnViewport( $(this) );
             
             var $devBtn = $elemToEdit.find('.dev__elementTree').find('.dev__elemTree__item.active');
 
-            $devBtn.attr('tagname', thisText);
-            $devBtn.find('.dev__elemTree__itemTagname').text( thisText );
+            if ( !(thisTagname === 'img' && $devBtn.next('.dev__treeCol').children('.dev__elemTree__i').length > 0)  ) {
 
-            if( $devBtn.attr('elem_classes') ) {
-                $elemToEdit.find('.dev__panelAdd').find('input[name="class"]').val( $devBtn.attr('elem_classes') );
+                $devBtn.attr('tagname', thisTagname);
+                $devBtn.find('.dev__elemTree__itemTagname').text( thisText );
+
+                if( $devBtn.attr('elem_classes') ) {
+                    $elemToEdit.find('.dev__panelAdd').find('input[name="class"]').val( $devBtn.attr('elem_classes') );
+                }
+
+                if( $devBtn.attr('elem_id') ) {
+                    $elemToEdit.find('.dev__panelAdd').find('input[name="id"]').val( $devBtn.attr('elem_id') );
+                }
+
+                if( $devBtn.attr('elem_href') ) {
+                    $elemToEdit.find('.dev__panelAdd').find('input[name="href"]').val( $devBtn.attr('elem_href') );
+                }
+
+                if( $devBtn.attr('elem_innerText') ) {
+                    $elemToEdit.find('.dev__panelAdd').find('textarea[name="innerText"]').val( $devBtn.attr('elem_innertext') );
+                }
+            } else {
+                showNotificationOnTheTopOfWindow( 'Нельзя изменить на IMG если внутри есть дочерние элементы' );
             }
 
-            if( $devBtn.attr('elem_id') ) {
-                $elemToEdit.find('.dev__panelAdd').find('input[name="id"]').val( $devBtn.attr('elem_id') );
-            }
-
-            if( $devBtn.attr('elem_href') ) {
-                $elemToEdit.find('.dev__panelAdd').find('input[name="href"]').val( $devBtn.attr('elem_href') );
-            }
-
-            if( $devBtn.attr('elem_innerText') ) {
-                $elemToEdit.find('.dev__panelAdd').find('textarea[name="innerText"]').val( $devBtn.attr('elem_innertext') );
-            }
-
+            setTreeElemsWidthes();
         });
 
 
@@ -1077,38 +1199,80 @@ jQuery(document).ready(function ($) {
             /* Вставить внутрь */
             if ( $this.attr('action') === 'dev__elemTreeInsertChild' ) {
 
-                if ( !$this.parents('.dev__treeCol').next().length ) {
-
-                    var currentColIndex = $this.parents('.dev__treeCol').index(),
-                        nextColIndex = ++currentColIndex;
-
-                    $('<div class="dev__treeCol" id="col_'+nextColIndex+'"></div>').insertAfter( $this.parents('.dev__treeCol') );
-                }
-
-
                 var $elemTreeBtn  = create_devElemTreeItem('', 'DIV');
 
+                $elemTreeBtn.appendTo( $this.closest('.dev__elemTree__item').next('.dev__treeCol') );
 
-                $this.parents('.dev__treeCol').next().append( $elemTreeBtn );
+                create_treeElemsMenu( $elemTreeBtn.find('.dev__elemTree__item') );
 
-                create_treeElemsMenu( $elemTreeBtn );
-
-                $this.parents('.dev__popup').find('.dev__saveChanges').attr('action', 'dev__elemTreeInsertChild');
+                $this.parents('.dev__popup').find('.dev__saveChanges').attr('action', $this.attr('action'));
 
                 $this.parents('.dev__popup').find('.dev__panelAdd').remove();
                 $this.parents('.dev__popup').find('.dev__panel').remove();
 
+                $( ".dev__treeCol" ).sortable();
+
+            }
+            /* Вставить после */
+            if ( $this.attr('action') === 'dev__elemTreeInsertAfter' ) {
+
+                var $elemTreeBtn  = create_devElemTreeItem('', 'DIV');
+
+                var $el = $elemTreeBtn.insertAfter( $this.closest('.dev__elemTree__i') );
+
+                create_treeElemsMenu( $elemTreeBtn.find('.dev__elemTree__item') );
+
+                $this.parents('.dev__popup').find('.dev__saveChanges').attr('action', $this.attr('action'));
+
+                $this.parents('.dev__popup').find('.dev__panelAdd').remove();
+                $this.parents('.dev__popup').find('.dev__panel').remove();
+
+                $( ".dev__treeCol" ).sortable();
+
+            }
+            /* Вставить перед */
+            if ( $this.attr('action') === 'dev__elemTreeInsertBefore' ) {
+
+                var $elemTreeBtn  = create_devElemTreeItem('', 'DIV');
+
+                var $el = $elemTreeBtn.insertBefore( $this.closest('.dev__elemTree__i') );
+
+                create_treeElemsMenu( $elemTreeBtn.find('.dev__elemTree__item') );
+
+                $this.parents('.dev__popup').find('.dev__saveChanges').attr('action', $this.attr('action'));
+
+                $this.parents('.dev__popup').find('.dev__panelAdd').remove();
+                $this.parents('.dev__popup').find('.dev__panel').remove();
+
+                $( ".dev__treeCol" ).sortable();
+
+            }
+            /* Удалить */
+            if ( $this.attr('action') === 'dev__elemTreeRemoveElem' ) {
+
+                $this.closest('.dev__elemTree__i').remove();
+
+            }
+            /* Дублировать */
+            if ( $this.attr('action') === 'dev__elemTreeCopyElem' ) {
+
+                var $elemCloned = $this.closest('.dev__elemTree__i').clone();
+                
+                $this.closest('.dev__elemTree__i').after( $elemCloned );
+
+                $( ".dev__treeCol" ).sortable();
+
             }
 
+            setElemTreeLines();
 
+            setTreeElemsWidthes();
         });
 
         $(document).on('input', '.dev__panelAdd input, .dev__panelAdd textarea', function(){
 
             var $elemToEdit = getCurrentElemToEdit_selectedOnViewport( $(this) ),
                 $devBtn = $elemToEdit.find('.dev__elementTree').find('.dev__elemTree__item.active');
-
-            console.log( 'hhhh' );
 
             if ( $(this).attr('name') === 'id' ) {
                 $devBtn.attr( 'elem_id', $(this).val() );

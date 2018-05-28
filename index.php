@@ -20,6 +20,8 @@
     <link class="develop__css" rel="stylesheet" href="develop/develop.css">
     <link class="develop__css" rel="stylesheet" href="develop/develop-btns-panel-bootstarp.css">
 
+    <script src="develop/ResizeSensor.js"></script>
+
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>
@@ -62,6 +64,8 @@
 
     <!-- develop js -->
     <script class="develop__js" type="text/javascript" src="develop/develop.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
     <!-- custom js -->
     <script type="text/javascript" src="js/custom.js"></script>
     <!-- initializations -->
