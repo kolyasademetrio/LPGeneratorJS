@@ -1149,6 +1149,8 @@ jQuery(document).ready(function ($) {
                 });
 
                 $elemToEdit.find('.dev__devPanelAdd__addElementTree .panel-heading').html( 'Настройте <span class="text-uppercase">'+$this.attr('tagname')+'</span>');
+
+                setTreeElemsWidthes();
             }
         });
 
