@@ -71,6 +71,81 @@ div[class^=dev__] textarea {
     height: auto;
     resize: none;
 }
+
+.dev__fileFieldInner {
+    position: relative;
+    overflow: hidden;
+    width: 150px;
+    height: 150px;
+    border: 2px dashed #337ab7;
+    border-radius: 5px;
+    display: block;
+    padding: 30px 10px;
+    -webkit-transition: all 300ms ease 0s;
+    -moz-transition: all 300ms ease 0s;
+    -o-transition: all 300ms ease 0s;
+    transition: all 300ms ease 0s;
+
+    -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
+
+    cursor: pointer;
+    text-align: center;
+}
+
+.dev__fileFieldInner:hover {
+    border: 2px solid #333;
+}
+
+
+.dev__fileFieldInner img {
+    position: absolute !important;
+    top: 50% !important;
+    left: 50% !important;
+    -webkit-transform: translateX( -50% ) translateY( -50% ) !important;
+       -moz-transform: translateX( -50% ) translateY( -50% ) !important;
+        -ms-transform: translateX( -50% ) translateY( -50% ) !important;
+         -o-transform: translateX( -50% ) translateY( -50% ) !important;
+            transform: translateX( -50% ) translateY( -50% ) !important;
+    width: 100%;
+}
+
+.dev__fileFieldInner input[type="file"] {
+    outline: 0;
+    opacity: 0;
+    pointer-events: none;
+    user-select: none;
+}
+
+.dev__fileFieldInner span.glyphicon {
+    display: block;
+    font-size: 42px;
+    padding-bottom: 16px;
+    color: #337ab7;
+
+    -webkit-transition: all 300ms ease 0s;
+    -moz-transition: all 300ms ease 0s;
+    -o-transition: all 300ms ease 0s;
+    transition: all 300ms ease 0s;
+}
+
+.dev__fileFieldInner:hover span.glyphicon {
+    color: #333;
+}
+
+.dev__fileFieldInnerText {
+    color: #337ab7;
+
+    -webkit-transition: all 300ms ease 0s;
+    -moz-transition: all 300ms ease 0s;
+    -o-transition: all 300ms ease 0s;
+    transition: all 300ms ease 0s;
+}
+
+.dev__fileFieldInner:hover .dev__fileFieldInnerText {
+    color: #333;
+}
+
 /* Общие стили для полей ввода End */
 
 

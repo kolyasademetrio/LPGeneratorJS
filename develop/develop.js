@@ -589,7 +589,11 @@ jQuery(document).ready(function ($) {
             'fieldName': 'dev__fileNameField',
             'input': '<div class="form-group dev__fileField">' +
                         '<label for="dev__fileField" class="dev__">Изображение</label>' +
-                        '<input type="file" id="dev__fileField" class="form-control-file dev__" name="file">' +
+                        '<label class="dev__fileFieldInner">' +
+                            '<span class="glyphicon glyphicon-paperclip dev__"></span>' +
+                            '<span class="dev__fileFieldInnerText">Добавьте файл</span>' +
+                            '<input type="file" id="dev__fileField" class="form-control-file dev__" name="file">' +
+                        '</label>' +
                      '</div>',
             'exceptions': [],
             'only': ['img'],
@@ -1301,8 +1305,43 @@ jQuery(document).ready(function ($) {
                 $devBtn.attr( 'elem_href', $(this).val() );
             }
 
+        });
 
+        function readURL(input) {
 
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    var image = new Image();
+                    image.src = e.target.result;
+
+                    image.onload = function() {
+
+                        var $img = $('<img class="dev__elemTreeImgPreview">').attr('src', this.src);
+
+                        $img.appendTo( $(input).closest('.dev__fileFieldInner').find('img').remove().end() );
+
+                        if ( this.width >= this.height ) {
+                            $(input).closest('.dev__fileFieldInner').find('.dev__elemTreeImgPreview').css({
+                                'height': 'auto',
+                                'width': '100%'
+                            });
+                        } else {
+                            $(input).closest('.dev__fileFieldInner').find('.dev__elemTreeImgPreview').css({
+                                'height': '100%',
+                                'width': 'auto'
+                            });
+                        }
+                    }
+                }
+
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        $(document).on('change', '#dev__fileField',function() {
+            readURL(this);
         });
 
     })();
