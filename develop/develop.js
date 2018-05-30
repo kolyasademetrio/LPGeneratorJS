@@ -1150,6 +1150,12 @@ jQuery(document).ready(function ($) {
                     if ( elemAttrName === 'href' && $.trim($this.attr('href')) ) {
                         $(elem).val( $this.attr('href') );
                     }
+
+                    if ( elemAttrName === 'file' && $.trim($this.attr('src')) ) {
+                        var $img = $('<img class="dev__elemTreeImgPreview" src="'+$this.attr('src')+'">').insertAfter( $(elem) );
+                        $img.width( $this.attr('width') );
+                        $img.height( $this.attr('height') );
+                    }
                 });
 
                 $elemToEdit.find('.dev__devPanelAdd__addElementTree .panel-heading').html( 'Настройте <span class="text-uppercase">'+$this.attr('tagname')+'</span>');
@@ -1188,6 +1194,14 @@ jQuery(document).ready(function ($) {
 
                 if( $devBtn.attr('elem_innerText') ) {
                     $elemToEdit.find('.dev__panelAdd').find('textarea[name="innerText"]').val( $devBtn.attr('elem_innertext') );
+                }
+
+                if( $devBtn.attr('src') ) {
+                    var $img = $('<img class="dev__elemTreeImgPreview">').insertAfter( $elemToEdit.find('.dev__panelAdd').find('input[name="file"]') ) ;
+
+                    $img.attr('src', $devBtn.attr('src') );
+                    $img.width( $devBtn.attr('width') );
+                    $img.height( $devBtn.attr('height') );
                 }
             } else {
                 showNotificationOnTheTopOfWindow( 'Нельзя изменить на IMG если внутри есть дочерние элементы' );
@@ -1307,14 +1321,20 @@ jQuery(document).ready(function ($) {
 
         });
 
-        function readURL(input) {
+        function getSetElemTreeImgPreview(input) {
 
             if (input.files && input.files[0]) {
                 var reader = new FileReader();
-                
+
                 reader.onload = function(e) {
                     var image = new Image();
                     image.src = e.target.result;
+
+                    var $elemToEdit = getCurrentElemToEdit_selectedOnViewport( $(input) ),
+                        $devBtn = $elemToEdit.find('.dev__elementTree').find('.dev__elemTree__item.active');
+
+                    var imageWidth,
+                        imageHeight;
 
                     image.onload = function() {
 
@@ -1323,16 +1343,25 @@ jQuery(document).ready(function ($) {
                         $img.appendTo( $(input).closest('.dev__fileFieldInner').find('img').remove().end() );
 
                         if ( this.width >= this.height ) {
-                            $(input).closest('.dev__fileFieldInner').find('.dev__elemTreeImgPreview').css({
-                                'height': 'auto',
-                                'width': '100%'
-                            });
+                            imageHeight = 'auto';
+                            imageWidth = '100%';
                         } else {
-                            $(input).closest('.dev__fileFieldInner').find('.dev__elemTreeImgPreview').css({
-                                'height': '100%',
-                                'width': 'auto'
-                            });
+                            imageHeight = '100%';
+                            imageWidth = 'auto';
                         }
+
+                        $(input).closest('.dev__fileFieldInner').find('.dev__elemTreeImgPreview').css({
+                            'height': imageHeight,
+                            'width': imageWidth,
+                        });
+
+                        $devBtn.attr('src', e.target.result);
+                        $devBtn.attr('src_2', input.files[0]);
+                        $devBtn.attr('width', imageWidth);
+                        $devBtn.attr('height', imageHeight);
+
+                        console.log( $devBtn.attr('src_2') );
+                        console.log( input.files[0] );
                     }
                 }
 
@@ -1341,7 +1370,7 @@ jQuery(document).ready(function ($) {
         }
 
         $(document).on('change', '#dev__fileField',function() {
-            readURL(this);
+            getSetElemTreeImgPreview(this);
         });
 
     })();
@@ -1377,7 +1406,26 @@ jQuery(document).ready(function ($) {
 
 
 
+$(document).on('click', '.dev__saveChanges.dev__addElementTree', function(e){
 
+    var base = getCurrentElemToEdit_selectedOnViewport($(e.target)).find('.dev__elemTree__item.active').attr('src');
+    
+    console.log( base );
+    
+    $.ajax({
+        type: 'POST',
+        url: 'image-handler.php',
+        data:{
+            base64: base
+        },
+        success: function(response) {
+
+        },
+        error: function(response) {
+
+        },
+    });
+});
 
 
 
