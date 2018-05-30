@@ -1153,6 +1153,7 @@ jQuery(document).ready(function ($) {
 
                     if ( elemAttrName === 'file' && $.trim($this.attr('src')) ) {
                         var $img = $('<img class="dev__elemTreeImgPreview" src="'+$this.attr('src')+'">').insertAfter( $(elem) );
+                        $img.after('<span class="dev__elemTreeImgPreviewRemove">&times;</span>');
                         $img.width( $this.attr('width') );
                         $img.height( $this.attr('height') );
                     }
@@ -1371,6 +1372,14 @@ jQuery(document).ready(function ($) {
 
         $(document).on('change', '#dev__fileField',function() {
             getSetElemTreeImgPreview(this);
+        });
+
+        $(document).on('click', 'label.dev__fileFieldInner', function(e){
+            if ( e.target.className === 'dev__elemTreeImgPreviewRemove' ) {
+                e.preventDefault();
+
+                $(e.target).prev('img').remove();
+            }
         });
 
     })();
