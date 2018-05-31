@@ -631,6 +631,16 @@ div[class^=dev__] textarea {
     top: 0;
     right: 0;
     display: block;
+    border-bottom: 2px dashed #337ab7;
+    border-left: 2px dashed #337ab7;
+}
+
+.dev__fileFieldInner:hover .dev__elemTreeImgPreviewRemove {
+    color: #333;
+    border-color: #333;
+    border-style: solid;
+    border-top: 0 none;
+    border-right: 0 none;
 }
 
 /* ------------------------ Панель elemTree End -------------------- */

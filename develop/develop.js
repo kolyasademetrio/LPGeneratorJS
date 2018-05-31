@@ -131,7 +131,7 @@ jQuery(document).ready(function ($) {
             {
                 'text': 'Вставить внутрь',
                 'action': 'dev__elemTreeInsertChild',
-                'exceptions': [],
+                'exceptions': ['img'],
             },
             {
                 'text': 'Вставить после',
@@ -154,26 +154,24 @@ jQuery(document).ready(function ($) {
                 'exceptions': ['dev__elemToEdit'],
             },
         ];
-
-        if ( !$this.find('.dev__treeElemMenu').length ) {
-
-            var $dev__treeElemMenu = $('<ul class="dev__treeElemMenu panel panel-primary"></ul>').appendTo( $this );
-
-            treeElemsMenuArray.forEach(function(treeElemMenuItem){
-
-                var exeptionTAGs = treeElemMenuItem.exceptions,
-                    thisAttrElem = $this.attr('elem');
-                
-                if ( $.inArray( thisAttrElem, exeptionTAGs ) === -1 ) {
-
-                    $('<li class="dev__treeElemMenuItem" action="'+treeElemMenuItem.action+'">'+treeElemMenuItem.text+'</li>').appendTo( $dev__treeElemMenu );
-
-                }
-
-
-
-            });
+        
+        if ( $this.find('.dev__treeElemMenu').length ) {
+            $this.find('.dev__treeElemMenu').remove();
         }
+
+        var $dev__treeElemMenu = $('<ul class="dev__treeElemMenu panel panel-primary"></ul>').appendTo( $this );
+
+        treeElemsMenuArray.forEach(function(treeElemMenuItem){
+
+            var exeptionTAGs = treeElemMenuItem.exceptions,
+                thisAttrElem = $this.attr('elem'),
+                thisAttrTagname = $this.attr('tagname');
+
+            if ( ($.inArray( thisAttrElem, exeptionTAGs ) === -1) && ($.inArray( thisAttrTagname, exeptionTAGs ) === -1) ) {
+
+                    $('<li class="dev__treeElemMenuItem" action="' + treeElemMenuItem.action + '">' + treeElemMenuItem.text + '</li>').appendTo($dev__treeElemMenu);
+            }
+        });
     }
 
     function create_devElemTreeItem(dev__elemTreeItem_class, tagName){
@@ -593,6 +591,7 @@ jQuery(document).ready(function ($) {
                             '<span class="glyphicon glyphicon-paperclip dev__"></span>' +
                             '<span class="dev__fileFieldInnerText">Добавьте файл</span>' +
                             '<input type="file" id="dev__fileField" class="form-control-file dev__" name="file">' +
+                            '<span class="dev__elemTreeImgPreviewRemove">&times;</span>' +
                         '</label>' +
                      '</div>',
             'exceptions': [],
@@ -705,7 +704,6 @@ jQuery(document).ready(function ($) {
     $(document).on('click', '.dev__libraryElem', function(){
 
         setInputsForClicked_libraryElem( $(this) );
-
 
     });
 
@@ -1153,7 +1151,7 @@ jQuery(document).ready(function ($) {
 
                     if ( elemAttrName === 'file' && $.trim($this.attr('src')) ) {
                         var $img = $('<img class="dev__elemTreeImgPreview" src="'+$this.attr('src')+'">').insertAfter( $(elem) );
-                        $img.after('<span class="dev__elemTreeImgPreviewRemove">&times;</span>');
+
                         $img.width( $this.attr('width') );
                         $img.height( $this.attr('height') );
                     }
@@ -1204,6 +1202,8 @@ jQuery(document).ready(function ($) {
                     $img.width( $devBtn.attr('width') );
                     $img.height( $devBtn.attr('height') );
                 }
+
+                create_treeElemsMenu( $devBtn );
             } else {
                 showNotificationOnTheTopOfWindow( 'Нельзя изменить на IMG если внутри есть дочерние элементы' );
             }
@@ -1341,7 +1341,9 @@ jQuery(document).ready(function ($) {
 
                         var $img = $('<img class="dev__elemTreeImgPreview">').attr('src', this.src);
 
-                        $img.appendTo( $(input).closest('.dev__fileFieldInner').find('img').remove().end() );
+                        $(input).closest('.dev__fileFieldInner').find('img').remove()
+
+                        $(input).after( $img );
 
                         if ( this.width >= this.height ) {
                             imageHeight = 'auto';
@@ -1357,12 +1359,8 @@ jQuery(document).ready(function ($) {
                         });
 
                         $devBtn.attr('src', e.target.result);
-                        $devBtn.attr('src_2', input.files[0]);
                         $devBtn.attr('width', imageWidth);
                         $devBtn.attr('height', imageHeight);
-
-                        console.log( $devBtn.attr('src_2') );
-                        console.log( input.files[0] );
                     }
                 }
 
@@ -1379,6 +1377,13 @@ jQuery(document).ready(function ($) {
                 e.preventDefault();
 
                 $(e.target).prev('img').remove();
+
+                var $elemToEdit = getCurrentElemToEdit_selectedOnViewport( $(e.target) ),
+                    $devBtn = $elemToEdit.find('.dev__elementTree').find('.dev__elemTree__item.active');
+
+                $devBtn.attr('src', '');
+                $devBtn.attr('width', '');
+                $devBtn.attr('height', '');
             }
         });
 
