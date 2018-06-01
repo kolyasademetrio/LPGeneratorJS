@@ -561,6 +561,7 @@ div[class^=dev__] textarea {
     float: left;
     margin-bottom: 10px;
     position: relative;
+    min-width: 70px;
 }
 
 .dev__elemTree__item:after {

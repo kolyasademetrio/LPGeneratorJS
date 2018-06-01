@@ -1141,8 +1141,11 @@ jQuery(document).ready(function ($) {
                         $(elem).val( $this.attr('elem_id') );
                     }
 
-                    if ( elemAttrName === 'innerText' && $.trim($this.attr('innerText')) ) {
-                        $(elem).val( $this.attr('innerText') );
+                    console.log( elemAttrName );
+                    console.log( $this );
+
+                    if ( elemAttrName === 'innerText' && $.trim($this.attr('elem_innertext')) ) {
+                        $(elem).val( $this.attr('elem_innertext') );
                     }
 
                     if ( elemAttrName === 'href' && $.trim($this.attr('href')) ) {
