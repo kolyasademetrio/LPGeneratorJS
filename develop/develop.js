@@ -982,7 +982,7 @@ jQuery(document).ready(function ($) {
             if ( e.target.tagName == 'LI' ) {
 
                 /* Деактивируем кнопку Сохранить */
-                addClassDisabled_to_devSaveChangesBtn( $(e.target) );
+                /*addClassDisabled_to_devSaveChangesBtn( $(e.target) );*/
                 /* Создаем dev__elementTree */
                 $('.dev__popupContainer').prepend( create_dev__elementTree() );
 
@@ -1108,7 +1108,7 @@ jQuery(document).ready(function ($) {
                         $('.dev__libraryElem').removeClass('active');
                         $(elem).addClass('active');
 
-                        $elemToEdit.find('.dev__saveChanges').html('Вставить ' + dataTagName).attr('tagname', dataTagName).removeClass('disabled');
+                        /*$elemToEdit.find('.dev__saveChanges').html('Вставить ' + dataTagName).attr('tagname', dataTagName).removeClass('disabled');*/
 
                         /* Вставляем Поля в Панель с полями */
                         inputsArray.forEach(function(item){
