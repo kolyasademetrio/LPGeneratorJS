@@ -62,7 +62,23 @@
     <!-- popup JS -->
     <script src="plugins/magnific-popup/jquery.magnific-popup.min.js"></script>
 
+    <!---------------->
     <!-- develop js -->
+    <!---------------->
+
+    <!-- texteditor -->
+    <link class="develop__css" rel="stylesheet" href="develop/texteditor/codemirror.css">
+    <link class="develop__css" rel="stylesheet" href="develop/texteditor/material.css">
+    <link class="develop__css" rel="stylesheet" href="develop/texteditor/monokai.css">
+
+    <script class="develop__js" type="text/javascript" src="develop/texteditor/codemirror.js"></script>
+    <script class="develop__js" type="text/javascript" src="develop/texteditor/closebrackets.js"></script>
+    <script class="develop__js" type="text/javascript" src="develop/texteditor/css.js"></script>
+    <script class="develop__js" type="text/javascript" src="develop/texteditor/emmet-codemirror.js"></script>
+    <script class="develop__js" type="text/javascript" src="develop/texteditor/matchbrackets.js"></script>
+    <script class="develop__js" type="text/javascript" src="develop/texteditor/sublime.js"></script>
+
+
     <script class="develop__js" type="text/javascript" src="develop/develop.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 

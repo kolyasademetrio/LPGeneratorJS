@@ -220,6 +220,33 @@ jQuery(document).ready(function ($) {
         }
     }
 
+    var textEditor;
+
+    function initCodeMirror (elemID = "dev__stylesField") {
+        var textEditor = CodeMirror.fromTextArea(document.getElementById( elemID ), {
+            mode:  "css",
+            theme: 'material',
+            lineNumbers: true,
+            autoCloseBrackets: true,
+            matchBrackets: true,
+            keyMap: 'sublime',
+        });
+
+        emmetCodeMirror(textEditor);
+
+        var $elemToEdit = getCurrentElemToEdit_selectedOnViewport( $('#'+elemID) );
+
+        var $devBtn = $elemToEdit.find('.dev__elementTree').find('.dev__elemTree__item.active');
+
+        textEditor.on('change',function(cMirror){
+
+            $devBtn.attr( 'elem_styles', cMirror.getValue() );
+
+        });
+
+        return textEditor;
+    }
+
     function setInputsForClicked_libraryElem( $thisClicked ) {
         var $this = $thisClicked,
             dataTagName = $this.attr('tagname'),
@@ -237,9 +264,9 @@ jQuery(document).ready(function ($) {
             $this.addClass('active');
 
             /* Передача атрибутов добавляемого элемента кнопке + вставка текста кнопки плюс удаление класса disabled */
-            submitBtn.html('Вставить ' + dataText).attr('tagname', dataTagName).attr('text', dataText).removeClass('disabled');
-
-
+            if ( !$this.parents('.dev__panel').hasClass('dev__devPanel__addElementTree') ) {
+                submitBtn.html('Вставить ' + dataText).attr('tagname', dataTagName).attr('text', dataText).removeClass('disabled');
+            }
 
             /* Вставка .dev__panelAdd в который помещаются поля для настроек */
             var $panelDev = $this.parents('.dev__popup').find('.dev__panel');
@@ -256,9 +283,17 @@ jQuery(document).ready(function ($) {
                 /* Если ID выбранного на фронте блока есть в массиве Исключений то пункт меню не добавляется */
                 // if ( $.inArray( dataTagName, exeptionTAGs ) === -1 ) {
                 if ( $.inArray( dataTagName, exeptionTAGs ) === -1 && (onlyTAGs.length === 0 || $.inArray( dataTagName, onlyTAGs) !== -1 ) ) {
-                    var classCols = item.fieldName != 'dev__indentsField' ? 'col-xs-6' : 'col-xs-12';
+                    var classCols = item.fieldName != 'dev__indentsField' ||
+                                    item.fieldName != 'dev__stylesNameField' ?
+                                    'col-xs-6' : 'col-xs-6';
 
                     $('.dev__panelAddInner').append('<div class="'+classCols+'">'+item.input+'</div>');
+
+                    if ( item.fieldName == 'dev__stylesNameField' ) {
+
+                        window.textEditor = initCodeMirror();
+
+                    }
 
                 }
 
@@ -459,7 +494,7 @@ jQuery(document).ready(function ($) {
             4) добавление в блок с гамбургером списка меню
         */
         // if (!className.startsWith('dev__')) {
-        if ( !$(e.target).is('[class*="dev__"]') ) {
+        if ( !$(e.target).is('[class*="dev__"]') && !$(e.target).parents('.CodeMirror').length ) {
 
             hightlightElem_AddHamburger (e.target);
 
@@ -596,6 +631,14 @@ jQuery(document).ready(function ($) {
                      '</div>',
             'exceptions': [],
             'only': ['img'],
+        },{
+            'fieldName': 'dev__stylesNameField',
+            'input': '<div class="form-group dev__stylesField">' +
+                        '<label for="dev__stylesField" class="dev__">Стили CSS</label>' +
+                        '<textarea id="dev__stylesField" class="dev__" name="elemStyles" rows="4" placeholder=""></textarea>' +
+                     '</div>',
+            'exceptions': [],
+            'only': [],
         },/*{
          'fieldName': 'dev__indentsField',
          'input':     '<div class="dev__indentsWrap">' +
@@ -1117,9 +1160,17 @@ jQuery(document).ready(function ($) {
                                 onlyTAGs = item.only;
                             /* Если ID выбранного на фронте блока есть в массиве Исключений то пункт меню не добавляется */
                             if ( $.inArray( $(elem).attr('tagname'), exeptionTAGs ) === -1 && (onlyTAGs.length === 0 || $.inArray( $(elem).attr('tagname'), onlyTAGs) !== -1 ) ) {
-                                var classCols = item.fieldName == 'dev__textNameField' ? 'col-xs-12' : 'col-xs-6';
+                                var classCols = item.fieldName == 'dev__textNameField' ||
+                                                item.fieldName == 'dev__stylesNameField' ?
+                                                'col-xs-6' : 'col-xs-6';
 
                                 $('.dev__panelAddInner').append('<div class="'+classCols+'">'+item.input+'</div>');
+
+                                if ( item.fieldName == 'dev__stylesNameField' ) {
+
+                                    window.textEditor = initCodeMirror();
+
+                                }
 
                             }
                         });
@@ -1131,6 +1182,7 @@ jQuery(document).ready(function ($) {
                 var $inputs = $elemToEdit.find('.dev__panelAddInner').find('input, textarea');
 
                 $inputs.each(function(index, elem){
+                    
                     var elemAttrName = $(elem).attr('name');
 
                     if ( elemAttrName === 'class' && $.trim($this.attr('elem_classes')) ) {
@@ -1140,9 +1192,6 @@ jQuery(document).ready(function ($) {
                     if ( elemAttrName === 'id' && $.trim($this.attr('elem_id')) ) {
                         $(elem).val( $this.attr('elem_id') );
                     }
-
-                    console.log( elemAttrName );
-                    console.log( $this );
 
                     if ( elemAttrName === 'innerText' && $.trim($this.attr('elem_innertext')) ) {
                         $(elem).val( $this.attr('elem_innertext') );
@@ -1157,6 +1206,10 @@ jQuery(document).ready(function ($) {
 
                         $img.width( $this.attr('width') );
                         $img.height( $this.attr('height') );
+                    }
+
+                    if ( elemAttrName === 'elemStyles' && $.trim($this.attr('elem_styles')) ) {
+                        window.textEditor.setValue( $this.attr('elem_styles') );
                     }
                 });
 
@@ -1325,6 +1378,7 @@ jQuery(document).ready(function ($) {
 
         });
 
+        
         function getSetElemTreeImgPreview(input) {
 
             if (input.files && input.files[0]) {

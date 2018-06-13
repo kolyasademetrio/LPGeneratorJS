@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="c1d9f538-c37e-4e58-b879-3a9007bf9304" name="LPGeneratorJS" url="http://kurtkipl.ftp.tools">
+        <fileTransfer host="kurtkipl.ftp.tools" port="21" rootFolder="/kurtkiplus.com.ua/lpgenerator">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" />
+          </advancedOptions>
+          <option name="port" value="21" />
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>
