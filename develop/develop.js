@@ -21,7 +21,7 @@ jQuery(document).ready(function ($) {
     });
     /* ---------------------------------- generate End ------------------------------ */
 
-    /* ----------- Создание Начальное выделение основных контейнеров ---------------- */
+
     function isEmpty(el) {
         return !$.trim(el.html())
     }
@@ -304,14 +304,6 @@ jQuery(document).ready(function ($) {
 
     }
 
-    $(document).on('click', '.dev__treeElemMenuHumburger', function(){
-
-        $('.dev__treeElemMenuHumburger').not(this).next('.dev__treeElemMenu').hide();
-
-        $(this).next('.dev__treeElemMenu').slideToggle();
-
-    });
-
     function showNotificationOnTheTopOfWindow( notificationText ) {
         $( '<div class="dev__notification btn btn-danger"></div>' )
             .appendTo( document.body )
@@ -443,7 +435,7 @@ jQuery(document).ready(function ($) {
     }
 
 
-
+    /* ----------- Создание Начальное выделение основных контейнеров ---------------- */
     (function setInitialElemView() {
         if (isEmpty($('header'))) {
             $('header').css({
@@ -506,6 +498,14 @@ jQuery(document).ready(function ($) {
             $(e.target).parent('.dev__hamburger').find('ul').slideToggle();
 
         }
+    });
+
+    $(document).on('click', '.dev__treeElemMenuHumburger', function(){
+
+        $('.dev__treeElemMenuHumburger').not(this).next('.dev__treeElemMenu').hide();
+
+        $(this).next('.dev__treeElemMenu').slideToggle();
+
     });
     /* ---------------------------------- Click End --------------------------------- */
 
