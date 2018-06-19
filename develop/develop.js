@@ -433,7 +433,11 @@ jQuery(document).ready(function ($) {
                                 .append('<div class="dev__panelAdd-inputWrap">'+item.input+'</div>'
                             );
 
-                            window.textEditor = initCodeMirror();
+                            setTimeout(function(){
+                                window.textEditor = initCodeMirror();
+                            }, 1000);
+
+
                         } else {
                             $('.dev__panelAddInner')
                                 .find('.dev__panelAddColumn.first')
