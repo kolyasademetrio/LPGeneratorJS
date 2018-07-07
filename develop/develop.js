@@ -1705,7 +1705,7 @@ jQuery(document).ready(function ($) {
 
         var base = getCurrentElemToEdit_selectedOnViewport($(e.target)).find('.dev__elemTree__item.active').attr('src');
 
-        console.log(base);
+        console.log( $('.dev__elemTree__item') );
 
         $.ajax({
             type: 'POST',
