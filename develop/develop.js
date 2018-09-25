@@ -64,6 +64,16 @@ jQuery(document).ready(function ($) {
         return classesArray;
     }
 
+    function getAttributes( $node ) {
+        var attrs = {};
+
+        $.each($node[0].attributes, function(index, attribute){
+            attrs[attribute.name] = attribute.value;
+        });
+
+        return attrs;
+    }
+
     /*function removeBeforeElemForLastTreeElem(){
      $('.dev__treeCol').each(function(index, elem){
 
@@ -178,9 +188,10 @@ jQuery(document).ready(function ($) {
     }
 
     function create_devElemTreeItem(dev__elemTreeItem_class, tagName) {
-        var dev__elemTreeItem_class = ( dev__elemTreeItem_class !== undefined ) ? (dev__elemTreeItem_class + ' ') : '';
+        var dev__elemTreeItem_class = ( dev__elemTreeItem_class !== undefined ) ? (dev__elemTreeItem_class + ' ') : '',
+            dev__elemTree_i_class = ( dev__elemTreeItem_class.indexOf('dev__elemToEdit') !== -1 ) ? (' dev__elemToEdit_wrap') : '';
 
-        var $elemTree_item = $('<div class="dev__elemTree__i">' +
+        var $elemTree_item = $('<div class="dev__elemTree__i' + dev__elemTree_i_class + '">' +
                                     '<div elem="' + $.trim(dev__elemTreeItem_class) + '" class="' + dev__elemTreeItem_class + 'dev__elemTree__item btn btn-primary init" tagname="' + tagName + '">' +
                                         '<div class="dev__elemTree__itemTagname">' + tagName + '</div>' +
                                         '<div class="dev__elemTree__itemClasses"></div>' +
@@ -435,6 +446,7 @@ jQuery(document).ready(function ($) {
 
                             setTimeout(function(){
                                 window.textEditor = initCodeMirror();
+                                initCodeMirror();
                             }, 1000);
 
 
@@ -1322,6 +1334,46 @@ jQuery(document).ready(function ($) {
             } else if ($(e.target).hasClass('dev__saveChanges')) {
 
                 if (!$(e.target).hasClass('disabled')) {
+                    
+                    var $elemToEdit = getCurrentElemToEdit_selectedOnViewport($(e.target)),
+                        $elemTreeToEditContainer = $('.dev__elemToEdit_wrap'),
+                        $elemTreeToEdit = $('.dev__elemToEdit');
+
+                    function createNewElemFromElemTree( $elemInElemTree ) {
+                        var newElemTagname = $elemInElemTree.attr('tagname'),
+                            $newElem = $('<' + newElemTagname + '>'),
+                            elem_classes   = $elemInElemTree.attr('elem_classes'),
+                            elem_id        = $elemInElemTree.attr('elem_id'),
+                            elem_href      = $elemInElemTree.attr('elem_href'),
+                            src            = $elemInElemTree.attr('src'),
+                            elem_innertext = $elemInElemTree.attr('elem_innertext'),
+                            elem_styles    = $elemInElemTree.attr('elem_styles');
+
+                        if ( elem_classes !== undefined && elem_classes !== '' ) {
+                            $newElem.attr('class', elem_classes);
+                        }
+                        if ( elem_id !== undefined && elem_id !== '' ) {
+                            $newElem.attr('id', elem_id);
+                        }
+                        if ( elem_href !== undefined && elem_href !== '' ) {
+                            $newElem.attr('href', elem_href);
+                        }
+                        if ( src !== undefined && src !== '' ) {
+                            $newElem.attr('src', src);
+                       }
+                        if ( elem_innertext !== undefined && elem_innertext !== '' ) {
+                            $newElem.text(elem_innertext);
+                        }
+                        if ( elem_styles !== undefined && elem_styles !== '' ) {
+                            $newElem.attr('elem_styles', elem_styles);
+                        }
+
+                        console.log( $newElem );
+                    }
+
+                    createNewElemFromElemTree( $elemTreeToEdit );
+
+
 
                     var newElemTagname = $(e.target).attr('tagname'),
                         $newElem = $('<' + newElemTagname + '>'),
@@ -1706,16 +1758,6 @@ jQuery(document).ready(function ($) {
         var base = getCurrentElemToEdit_selectedOnViewport($(e.target)).find('.dev__elemTree__item.active').attr('src');
 
         var $rootElem = $('.dev__elemToEdit');
-
-        function getAttributes( $node ) {
-            var attrs = {};
-
-            $.each($node[0].attributes, function(index, attribute){
-                attrs[attribute.name] = attribute.value;
-            });
-
-            return attrs;
-        }
 
         console.log( getAttributes( $rootElem ) );
 
