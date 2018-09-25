@@ -1705,7 +1705,19 @@ jQuery(document).ready(function ($) {
 
         var base = getCurrentElemToEdit_selectedOnViewport($(e.target)).find('.dev__elemTree__item.active').attr('src');
 
-        console.log( $('.dev__elemTree__item') );
+        var $rootElem = $('.dev__elemToEdit');
+
+        function getAttributes( $node ) {
+            var attrs = {};
+
+            $.each($node[0].attributes, function(index, attribute){
+                attrs[attribute.name] = attribute.value;
+            });
+
+            return attrs;
+        }
+
+        console.log( getAttributes( $rootElem ) );
 
         $.ajax({
             type: 'POST',
